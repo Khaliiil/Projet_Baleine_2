@@ -1,63 +1,33 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy
 import aifc
+import numpy as np
+from numpy.fft import fft, rfft, fftfreq, fftshift
+import matplotlib.pyplot as plt
 
 
-#MISE EN NUMPY ARRAY DU SON
+f = open('C:\\Users\\AxllowFifty\\Desktop\\Samples\\train.csv')
+data = np.loadtxt(f, dtype= str , delimiter = ',')
+F = data[:0]                # 1ere colonne
+T = data[:1]                # 2eme colonne
 
-#filename = "test7.aiff"
-s = aifc.open("C:\\Users\\charpak2.21\\Desktop\\Projet_Baleine\\train\\train28367.aiff", 'r')
-nframes = s.getnframes()
+filename = 'C:\\Users\\AxllowFifty\\Desktop\\Samples\\train3.aiff'
+s = aifc.open(filename, 'r')
+nframes = s.getnframes() 
+assert nframes == 4000 # on valide qu'on a bien nombre de points = 4000
+
 strsig = s.readframes(nframes)
 y = np.fromstring(strsig, np.short).byteswap()
-print (y)    
-type(y)
+f_s = s.getframerate() #fréquence d'échantillonnage
+assert f_s == 2000 # on valide que c'est bien 2 kHz
+y_fft = np.fft.fft(y)
 
-#FFT ET VISUALISATION DU SON
-
-n = 40
-
-# definition de a
-
-y[1] = 1
-
-# visualisation de a
-# on ajoute a droite la valeur de gauche pour la periodicite
-plt.subplot(311)
-plt.plot( np.append(y, y[0]) )
-
-# calcul de A
-A = np.fft.rfft(y)
-print type(A)
-
-# visualisation de A
-# on ajoute a droite la valeur de gauche pour la periodicite
-B = np.append(A, A[0])
-plt.subplot(312)
-plt.plot(np.real(B))
-plt.ylabel("partie reelle")
-
-plt.subplot(313)
-plt.plot(np.imag(B))
-plt.ylabel("partie imaginaire")
-
+#plt.plot(y_fft)
 #plt.show()
 
-
-#Spectrogramme
-
-plt.figure(figsize=(18.,12.))
-#filename = "test4.aiff"
-f = aifc.open("C:\\Users\\charpak2.21\\Desktop\\Projet_Baleine\\train\\train28367.aiff", 'r')
-
-str_frames = f.readframes(f.getnframes())
-Fs = f.getframerate()
-time_data = np.fromstring(str_frames, np.short).byteswap()
-f.close()
-
-# spectrogram of file
-Pxx, freqs, bins, im = plt.specgram(time_data, NFFT=500, Fs=Fs,noverlap=300,cmap=plt.cm.gist_heat)
-#plt.title(filename+' fr'+filename_to_labels[filename])
-plt.show()
+Delta_T = 1./f_s # Delta temps entre samples
+N=nframes
+#ampl = 1/N * np.abs(y_fft)
+ampl = np.abs(y_fft)*1./N
+freqs = np.fft.fftfreq(N, Delta_T)
+plt.plot(freqs, ampl)
+plt.plot(freqs[:N/2], ampl[:N/2])
