@@ -7,33 +7,41 @@ import aifc
 
 #MISE EN NUMPY DU SON
 
-filename = "test7.aiff"
+filename = "test248.aiff"
 s = aifc.open("C:\\Users\\Orianne\\Documents\\projet\\whale_data\\data\\test\\" + filename, 'r')
 nframes = s.getnframes()
 strsig = s.readframes(nframes)
 y = np.fromstring(strsig, np.short).byteswap()
-print y    
-type(y)
+#print y    
+#type(y)
 
 
 #FFT ET VISUALISATION DU SON
 
 
 
-n = 40
+#n = 40
 
 # definition de a
 
-y[1] = 1
+#y[1] = 1
 
 # visualisation de a
 # on ajoute a droite la valeur de gauche pour la periodicite
-plt.subplot(311)
-plt.plot( np.append(y, y[0]) )
+plt.subplot(211)
+#plt.plot( np.append(y, y[50]) )
 
 # calcul de A
 A = np.fft.rfft(y)
-type(A)
+Z = A/4000
+print A
+plt.plot(Z)
+plt.ylabel("Amplitude")
+plt.xlabel("Frequenceeeeeeeee...")
+plt.title("FFT du son")
+
+#plt.title(filename+' fr'+filename_to_labels[filename])
+
 
 # visualisation de A
 # on ajoute a droite la valeur de gauche pour la periodicite
